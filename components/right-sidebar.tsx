@@ -1,9 +1,8 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight, Menu } from 'lucide-react';
-import { Button } from "@/components/ui/button";
+import { Menu } from 'lucide-react';
 import { usePathname } from "next/navigation";
 
 interface TOCItem {
@@ -25,33 +24,61 @@ export function RightSidebar({ className, isCollapsed, onCollapse }: RightSideba
   const [isHoverEnabled, setIsHoverEnabled] = useState(true);
 
   useEffect(() => {
-    const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
-    const tocItems = Array.from(headings).map((heading) => ({
-      id: heading.id,
-      text: heading.textContent || "",
-      level: parseInt(heading.tagName[1]),
-    }));
-    setToc(tocItems);
+    try {
+      const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+      const tocItems = Array.from(headings).map((heading, index) => {
+        if (!heading.id) {
+          heading.id = `heading-${index}`;
+        }
+        return {
+          id: heading.id,
+          text: heading.textContent || "",
+          level: parseInt(heading.tagName[1]),
+        };
+      });
+      setToc(tocItems);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: "-80px 0px -80% 0px" }
-    );
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveId(entry.target.id);
+            }
+          });
+        },
+        { rootMargin: "-80px 0px -80% 0px" }
+      );
 
-    headings.forEach((heading) => observer.observe(heading));
-    return () => observer.disconnect();
+      headings.forEach((heading) => observer.observe(heading));
+      return () => observer.disconnect();
+    } catch (error) {
+      console.error("Error in RightSidebar useEffect:", error);
+    }
   }, [pathname]);
 
   const handleCollapse = () => {
     setIsHoverEnabled(false);
     onCollapse();
     setTimeout(() => setIsHoverEnabled(true), 300);
+  };
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    try {
+      e.preventDefault();
+      const target = document.getElementById(id);
+      if (target) {
+        target.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+        window.history.pushState(null, '', `#${id}`);
+        setActiveId(id);
+      } else {
+        console.warn(`Target not found: ${id}`);
+      }
+    } catch (error) {
+      console.error("Error in handleLinkClick:", error);
+    }
   };
 
   return (
@@ -80,20 +107,15 @@ export function RightSidebar({ className, isCollapsed, onCollapse }: RightSideba
             {toc.map((item) => (
               <a
                 key={item.id}
-                href={`${pathname}#${item.id}`}
+                href={`#${item.id}`}
                 className={cn(
                   "block py-2 transition-transform hover:translate-y-[-1px]",
                   item.level === 1 && "pl-0",
                   item.level === 2 && "pl-4",
-                  item.level === 3 && "pl-8"
+                  item.level === 3 && "pl-8",
+                  activeId === item.id && "font-semibold text-blue-500 bg-gray-200 rounded" // 修正箇所
                 )}
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById(item.id)?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  });
-                }}
+                onClick={(e) => handleLinkClick(e, item.id)}
               >
                 {item.text}
               </a>
