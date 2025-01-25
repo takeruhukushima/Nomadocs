@@ -1,4 +1,10 @@
-## コンサルト的研究の方法論
+---
+title: コンサルト的研究の方法論
+description: 生産性、という言葉が嫌いな時期があった
+tags:
+  - HowToReserch
+created_at: 2025-01-25
+---
 
 ### Source
 [圧倒的に生産性の高い人（サイエンティスト）の研究スタイル](https://kaz-ataka.hatenablog.com/entry/20081018/1224287687)

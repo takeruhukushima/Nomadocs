@@ -1,4 +1,11 @@
-## 研究（発明）の方法論
+---
+title: 研究（発明）の方法論
+description: 研究（発明）のOverview
+tags:
+  - HowToReserch
+created_at: 2025-01-25
+---
+
 
 ### Source
 [研究法](https://www.youtube.com/watch?v=vn0cL7fxYh8&t=3197s)
